@@ -1,5 +1,8 @@
 
 import './bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+
 import { createApp } from 'vue';
 import router from './router';
 const app = createApp({});

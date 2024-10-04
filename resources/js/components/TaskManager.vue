@@ -1,85 +1,182 @@
 <template>
-    <div>
-      <h2>Task Manager</h2>
-      <form @submit.prevent="createTask">
-        <input v-model="newTask.title" type="text" placeholder="Task Title" required />
-        <textarea v-model="newTask.description" placeholder="Task Description"></textarea>
-        <select v-model="newTask.status">
-          <option>To Do</option>
-          <option>In Progress</option>
-          <option>Done</option>
-        </select>
-        <input v-model="newTask.due_date" type="date" required />
-        <button type="submit">Create Task</button>
-      </form>
-  
-      <ul v-if="tasks.length">
-        <li v-for="task in tasks" :key="task.id">
-          <strong>{{ task.title }}</strong> - {{ task.status }} 
-          <button @click="editTask(task)">Edit</button>
-          <button @click="deleteTask(task.id)">Delete</button>
-        </li>
-      </ul>
+  <div class="container mt-5">
+    <h2 class="mb-4">Create Task</h2>
+
+    <!-- Task Form -->
+    <div class="card">
+        <div class="card-body">
+            <form @submit.prevent="createTask" class="mb-5">
+              <div class="mb-3">
+                <label for="taskTitle" class="form-label">Task Title</label>
+                <input
+                  v-model="newTask.title"
+                  type="text"
+                  id="taskTitle"
+                  class="form-control"
+                  placeholder="Enter task title"
+                  required
+                />
+              </div>
+      
+              <div class="mb-3">
+                <label for="taskDescription" class="form-label">Task Description</label>
+                <EditorContent :editor="editor" class="form-control" />
+              </div>
+      
+              <div class="mb-3">
+                <label for="taskStatus" class="form-label">Task Status</label>
+                <select v-model="newTask.status" id="taskStatus" class="form-select">
+                  <option value="To Do">To Do</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Done">Done</option>
+                </select>
+              </div>
+      
+              <div class="mb-3">
+                <label for="dueDate" class="form-label">Due Date</label>
+                <input v-model="newTask.due_date" type="date" id="dueDate" class="form-control" required />
+              </div>
+      
+              <button type="submit" class="btn btn-primary">Create Task</button>
+            </form>
+        </div>
     </div>
-  </template>
-  
-  <script>
-  import axios from 'axios';
-  
-  export default {
-    data() {
-      return {
-        tasks: [],
-        newTask: {
-          title: '',
-          description: '',
-          status: 'To Do',
-          due_date: ''
-        },
-        editingTask: null,
-      };
-    },
-    created() {
-      this.fetchTasks();
-    },
-    methods: {
-      async fetchTasks() {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('/api/tasks', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        this.tasks = response.data;
+
+    <!-- Task List -->
+    <h2 class="my-4">Task List</h2>
+
+    <!-- Task Table -->
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Title</th>
+          <th scope="col">Description</th>
+          <th scope="col">Status</th>
+          <th scope="col">Due Date</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="task in tasks" :key="task.id">
+          <td>{{ task.title }}</td>
+          <td v-html="task.description"></td>
+          <td>{{ task.status }}</td>
+          <td>{{ (task.due_date) }}</td>
+          <td>
+            <button @click="editTask(task)" class="btn btn-warning btn-sm">Edit</button>
+            <button @click="deleteTask(task.id)" class="btn btn-danger btn-sm ml-2">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</template>
+
+<script>
+import { Editor, EditorContent } from "@tiptap/vue-3";
+import StarterKit from "@tiptap/starter-kit";
+import axios from "axios";
+
+export default {
+  components: {
+    EditorContent
+  },
+  data() {
+    return {
+      tasks: [],
+      newTask: {
+        title: "",
+        description: "",
+        status: "To Do",
+        due_date: ""
       },
-      async createTask() {
-        const token = localStorage.getItem('token');
-        const response = await axios.post('/api/tasks', this.newTask, {
+      editor: null,
+      editingTask: null
+    };
+  },
+  created() {
+    this.fetchTasks();
+    this.editor = new Editor({
+      content: "",
+      extensions: [StarterKit],
+      onUpdate: ({ editor }) => {
+        this.newTask.description = editor.getHTML();
+      }
+    });
+  },
+  methods: {
+    async fetchTasks() {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("/api/tasks", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      this.tasks = response.data;
+    },
+
+    async createTask() {
+      const token = localStorage.getItem("token");
+      if (this.editingTask) {
+        await axios.put(`/api/tasks/${this.editingTask.id}`, this.newTask, {
           headers: {
-            Authorization: `Bearer ${token}`,
-          },
+            Authorization: `Bearer ${token}`
+          }
+        });
+      } else {
+        const response = await axios.post("/api/tasks", this.newTask, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         });
         this.tasks.push(response.data);
-        this.resetForm();
-      },
-      async deleteTask(id) {
-        const token = localStorage.getItem('token');
-        await axios.delete(`/api/tasks/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        this.tasks = this.tasks.filter(task => task.id !== id);
-      },
-      editTask(task) {
-        this.newTask = { ...task };
-        this.editingTask = task;
-      },
-      resetForm() {
-        this.newTask = { title: '', description: '', status: 'To Do', due_date: '' };
-        this.editingTask = null;
       }
+      this.resetForm();
+    },
+    async deleteTask(id) {
+      const token = localStorage.getItem("token");
+      await axios.delete(`/api/tasks/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      this.tasks = this.tasks.filter(task => task.id !== id);
+    },
+    editTask(task) {
+      this.newTask = { ...task };
+      this.editingTask = task;
+    },
+    resetForm() {
+      this.newTask = {
+        title: "",
+        description: "",
+        status: "To Do",
+        due_date: ""
+      };
+      this.editingTask = null;
+      this.editor.commands.clearContent();
     }
-  };
-  </script>
-  
+  },
+  beforeUnmount() {
+    if (this.editor) {
+      this.editor.destroy();
+    }
+  }
+};
+</script>
+
+<style scoped>
+.editor {
+  min-height: 150px;
+  border: 1px solid #ced4da;
+  padding: 10px;
+  border-radius: 0.375rem;
+}
+.table th {
+  background-color: #4f5a66;
+  color: white;
+}
+.table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+</style>
