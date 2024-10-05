@@ -1,5 +1,5 @@
 **Task Management System:**<br/>
-This is a Laravel-based task management system that allows you to perform CRUD operations on tasks, including basic authentication, task listing, creation, updating, and deletion. The system also supports soft delete functionality and task profile photo upload.
+This is a Laravel-based task management system that allows you to perform CRUD operations on tasks, including basic authentication, task listing, creation, updating, and deletion.
 
 **Setup Instructions:**<br>
 Follow these steps to set up and run the task management system:
@@ -17,6 +17,7 @@ Generate Application Key: Generate the Laravel application key:<br>
 `php artisan key:generate`<br>
 Run Migrations: Run database migrations to create the necessary tables:
 
+ .env file setup. Database name and other configuration set here.
 
 `php artisan migrate`<br>
 Seed Database (Optional): If you want to populate the database with sample data, run the database seeder:
@@ -36,10 +37,9 @@ Install node package manager vue 3 and others packages.
 Access the Application: Once the frontend is running, you can access the application in your web browser at http://localhost:3000.
 
 **Usage:**<br>
-Authentication: The application includes built-in authentication. You can register a new task or login with existing credentials.
+Authentication: The application includes passport.
 task Management: After logging in, you can manage tasks by performing CRUD operations. tasks can be listed, created, updated, and deleted.
-Soft Delete: Deleted tasks are not permanently removed from the database but are soft deleted. You can restore or permanently delete soft-deleted tasks.
-Profile Photo Upload: When creating or updating a task, you can upload a profile photo.
+
 Folder Structure
 app: Contains application-specific code.
 database: Includes database migrations and seeders.
