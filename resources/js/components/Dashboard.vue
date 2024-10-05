@@ -1,15 +1,15 @@
 <template>
   <div class="d-flex" id="wrapper">
-    <div class="bg-dark border-end" id="sidebar-wrapper">
+    <div class="bg-secondary border-end" id="sidebar-wrapper">
       <div class="list-group list-group-flush">
         <router-link
           to="/dashboard"
-          class="list-group-item list-group-item-action list-group-item-light bg-dark text-white"
+          class="list-group-item list-group-item-action list-group-item-light bg-secondary text-white"
         >Dashboard</router-link>
 
         <router-link
           to="/create-task"
-          class="list-group-item list-group-item-action list-group-item-light bg-dark text-white"
+          class="list-group-item list-group-item-action list-group-item-light bg-secondary text-white"
         >
           <i class="bi bi-table"></i> Tasks
         </router-link>
@@ -19,8 +19,7 @@
     <div id="page-content-wrapper">
       <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
         <form class="d-flex ms-3">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-          <button class="btn btn-outline-success" type="submit">Search</button>
+          <input class="form-control me-2" @input="searchTask" v-model="search" type="search" placeholder="Search your task here..." aria-label="Search" />
         </form>
 
         <div class="navbar-collapse collapse justify-content-end" id="navbarSupportedContent">
@@ -182,7 +181,8 @@ export default {
       todoTasks: [],
       inProgressTasks: [],
       underReviewTasks: [],
-      completeTasks: []
+      completeTasks: [],
+      search: ''
     };
   },
 
@@ -259,6 +259,13 @@ export default {
           localStorage.removeItem("token");
           this.$router.push("/login");
         });
+    },
+
+    searchTask(){
+        this.todoTasks = this.todoTasks.filter(task => task.title.toLowerCase().includes(this.search.toLowerCase()));
+        this.inProgressTasks = this.inProgressTasks.filter(task => task.title.toLowerCase().includes(this.search.toLowerCase()));
+        this.underReviewTasks = this.underReviewTasks.filter(task => task.title.toLowerCase().includes(this.search.toLowerCase()));
+        this.completeTasks = this.completeTasks.filter(task => task.title.toLowerCase().includes(this.search.toLowerCase()));
     }
   }
 };
