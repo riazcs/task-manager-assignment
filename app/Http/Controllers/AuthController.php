@@ -25,7 +25,7 @@ class AuthController extends Controller
 
         $token = $user->createToken('LaravelAuthApp')->accessToken;
 
-        return response()->json(['token' => $token], 200);
+        return response()->json(['token' => $token, 'user' => $user], 200);
     }
 
     public function login(Request $request)
@@ -39,9 +39,19 @@ class AuthController extends Controller
             $user = Auth::user();
             $token = $user->createToken('LaravelAuthApp')->accessToken;
 
-            return response()->json(['token' => $token], 200);
+            return response()->json(['token' => $token, 'user' => $user], 200);
         } else {
             return response()->json(['error' => 'Unauthenticated'], 401);
         }
+    }
+
+    public function logout(Request $request)
+    {
+        if ($request->user()) {
+            $request->user()->token()->revoke();
+        }
+        return response()->json([
+            'message' => 'logout successfully',
+        ]);
     }
 }

@@ -32,7 +32,8 @@
                 <select v-model="newTask.status" id="taskStatus" class="form-select">
                   <option value="To Do">To Do</option>
                   <option value="In Progress">In Progress</option>
-                  <option value="Done">Done</option>
+                  <option value="Under Review">Under Review</option>
+                  <option value="Complete">Complete</option>
                 </select>
               </div>
       

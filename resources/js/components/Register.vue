@@ -161,7 +161,7 @@ export default {
                     password_confirmation: passwordConfirmation.value,
                 });
                 localStorage.setItem('token', response.data.token);
-                console.log("Registration successful:", response.data.token);
+                localStorage.setItem('user', JSON.stringify(response.data.user));
                 router.push("/dashboard");
             } catch (error) {
                 console.error("Registration error:", error);

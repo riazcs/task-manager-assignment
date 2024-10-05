@@ -4,12 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Task;
+use \Illuminate\Support\Str;
 
 class TaskController extends Controller
 {
     public function index()
     {
         $tasks = Task::all();
+        $tasks->each(function ($task) {
+            $task->description = Str::limit($task->description, 150);
+        });
         return response()->json($tasks);
     }
 
@@ -28,7 +32,7 @@ class TaskController extends Controller
 
     public function show($id)
     {
-        $task = Task::findOrFail($id);
+        $task = Task::with('comments.user')->findOrFail($id);
         return response()->json($task);
     }
 

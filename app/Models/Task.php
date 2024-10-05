@@ -11,4 +11,8 @@ class Task extends Model
     protected $fillable = [
         'description', 'status', 'due_date', 'title'
     ];
+
+    public function comments(){
+        return $this->hasMany(Comment::class);
+    }
 }

@@ -4,6 +4,7 @@ use App\Http\Controllers\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CommentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +22,7 @@ Route::post('/register', [AuthController::class, 'register']);
 
 
 Route::middleware('auth:api')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::resource('tasks', TaskController::class);
+    Route::resource('task-comments', CommentController::class);
 });
-Route::resource('tasks', TaskController::class);
-Route::post('task-comments/{id}', [TaskController::class, 'comment']);
