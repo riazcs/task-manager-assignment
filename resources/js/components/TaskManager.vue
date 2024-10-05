@@ -20,7 +20,11 @@
       
               <div class="mb-3">
                 <label for="taskDescription" class="form-label">Task Description</label>
-                <EditorContent :editor="editor" class="form-control" />
+                <editor
+                  api-key="wdwe4cdcb6537mp75ejkq0anbzx0o52ahsvsdueqnqbkjww8"
+                  :init="editorConfig"
+                  v-model="newTask.description"
+                />
               </div>
       
               <div class="mb-3">
@@ -73,13 +77,12 @@
 </template>
 
 <script>
-import { Editor, EditorContent } from "@tiptap/vue-3";
-import StarterKit from "@tiptap/starter-kit";
 import axios from "axios";
+import Editor from '@tinymce/tinymce-vue';
 
 export default {
   components: {
-    EditorContent
+    Editor
   },
   data() {
     return {
@@ -90,19 +93,30 @@ export default {
         status: "To Do",
         due_date: ""
       },
-      editor: null,
-      editingTask: null
+      editorConfig:{
+        height: 500,
+      menubar: false,
+      plugins: [
+        'advlist autolink lists link image charmap print preview anchor',
+        'searchreplace visualblocks code fullscreen',
+        'insertdatetime media table paste code help wordcount'
+      ],
+      toolbar:
+        'undo redo | formatselect | bold italic backcolor | \
+        alignleft aligncenter alignright alignjustify | \
+        bullist numlist outdent indent | removeformat | help'
+      }
     };
   },
   created() {
     this.fetchTasks();
-    this.editor = new Editor({
-      content: "",
-      extensions: [StarterKit],
-      onUpdate: ({ editor }) => {
-        this.newTask.description = editor.getHTML();
-      }
-    });
+    // this.editor = new Editor({
+    //   content: "",
+    //   extensions: [StarterKit],
+    //   onUpdate: ({ editor }) => {
+    //     this.newTask.description = editor.getHTML();
+    //   }
+    // });
   },
   methods: {
     async fetchTasks() {
