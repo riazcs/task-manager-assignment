@@ -68,6 +68,7 @@
           <td>{{ (task.due_date) }}</td>
           <td>
             <button @click="editTask(task)" class="btn btn-warning btn-sm">Edit</button>
+            <router-link :to="'/task-details/' + task.id" class="btn btn-info btn-sm">Show</router-link>
             <button @click="deleteTask(task.id)" class="btn btn-danger btn-sm ml-2">Delete</button>
           </td>
         </tr>
@@ -94,7 +95,7 @@ export default {
         due_date: ""
       },
       editorConfig:{
-        height: 500,
+        height: 300,
       menubar: false,
       plugins: [
         'advlist autolink lists link image charmap print preview anchor',
@@ -110,13 +111,6 @@ export default {
   },
   created() {
     this.fetchTasks();
-    // this.editor = new Editor({
-    //   content: "",
-    //   extensions: [StarterKit],
-    //   onUpdate: ({ editor }) => {
-    //     this.newTask.description = editor.getHTML();
-    //   }
-    // });
   },
   methods: {
     async fetchTasks() {
@@ -171,11 +165,6 @@ export default {
       this.editor.commands.clearContent();
     }
   },
-  beforeUnmount() {
-    if (this.editor) {
-      this.editor.destroy();
-    }
-  }
 };
 </script>
 

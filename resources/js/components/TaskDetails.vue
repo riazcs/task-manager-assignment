@@ -1,0 +1,142 @@
+<template>
+    <div class="container mt-5">
+        <h2 class="mb-4">Task Details</h2>
+
+        <!-- Task Form -->
+        <div class="card">
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="taskTitle" class="form-label">{{
+                        task && task.title ? task.title : ""
+                    }}</label>
+                </div>
+                <div class="mb-3">
+                    <label for="dueDate" class="form-label">{{
+                        task && task.due_date ? task.due_date : ""
+                    }}</label>
+                </div>
+                <div class="mb-3">
+                    <p v-html="task.description"></p>
+                </div>
+
+                <div class="mb-3">
+                    <label for="taskStatus" class="form-label"
+                        >Task Status</label
+                    >
+                    <select
+                        v-model="task.status"
+                        id="taskStatus"
+                        class="form-select"
+                        disabled
+                    >
+                        <option value="To Do">To Do</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Done">Done</option>
+                    </select>
+                </div>
+
+                <form @submit.prevent="submitComment" class="mb-5">
+                    <div class="mb-3">
+                        <label for="taskDescription" class="form-label"
+                            >Write your comment</label
+                        >
+                        <editor
+                            api-key="wdwe4cdcb6537mp75ejkq0anbzx0o52ahsvsdueqnqbkjww8"
+                            :init="editorConfig"
+                            v-model="comment"
+                        />
+                    </div>
+                    <button type="submit" class="btn btn-primary float-right">
+                        Send
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+import axios from "axios";
+import Editor from "@tinymce/tinymce-vue";
+
+export default {
+    components: {
+        Editor,
+    },
+    data() {
+        return {
+            task: {},
+            comment: '',
+            editorConfig: {
+                height: 200,
+                menubar: false,
+                plugins: [
+                    "advlist autolink lists link image charmap print preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "insertdatetime media table paste code help wordcount",
+                ],
+                toolbar:
+                    "undo redo | formatselect | bold italic backcolor | \
+        alignleft aligncenter alignright alignjustify | \
+        bullist numlist outdent indent | removeformat | help",
+            },
+        };
+    },
+    created() {
+        const taskId = this.$route.params.id;
+        this.fetchTaskDetails(taskId);
+    },
+    methods: {
+        async fetchTaskDetails(taskId) {
+            const token = localStorage.getItem("token");
+            const response = await axios.get(`/api/tasks/${taskId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            this.task = response.data;
+        },
+
+        async submitComment() {
+            const token = localStorage.getItem("token");
+            if (this.editingTask) {
+                await axios.post(
+                    `/api/task-comments/${this.editingTask.id}`,{
+                       'comment': this.comment,
+                    },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+            }
+            this.resetForm();
+        },
+
+        resetForm() {
+            this.comment = "";
+            this.editingTask = null;
+            this.editor.commands.clearContent();
+        },
+    },
+
+    beforeUnmount() {},
+};
+</script>
+
+<style scoped>
+.editor {
+    min-height: 150px;
+    border: 1px solid #ced4da;
+    padding: 10px;
+    border-radius: 0.375rem;
+}
+.table th {
+    background-color: #4f5a66;
+    color: white;
+}
+.table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+</style>
