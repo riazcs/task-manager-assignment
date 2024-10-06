@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description');
-            $table->enum('status', ['To Do', 'In Progress', 'Under Review', 'Complete']);
+            $table->string('status')->comment('To Do', 'In Progress', 'Under Review', 'Complete');
             $table->date('due_date');
             $table->timestamps();
         });
